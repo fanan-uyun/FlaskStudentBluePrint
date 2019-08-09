@@ -1,0 +1,33 @@
+{% extends "blank.html" %}
+
+{% block title %}
+    学生成绩
+{% endblock %}
+
+{% block container %}
+    <div class="container-fluid">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>姓名</th>
+                    <th>年龄</th>
+                    <th>性别</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in student_lists %}
+                <tr>
+                    <td>{{ student.name}}</td>
+                    <td>{{ student.age}}</td>
+                    <td>{{ student.gender}}</td>
+                    <td>
+                        <button class="btn btn-primary">奖励</button>
+                        <button class="btn btn-danger">开除</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

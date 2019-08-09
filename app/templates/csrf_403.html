@@ -1,0 +1,13 @@
+{% extends "blank.html" %}
+
+{% block label %}
+    403 error
+{% endblock %}
+
+{% block container %}
+    <div class="text-center">
+        <div class="error mx-auto" data-text="403">403</div>
+        <p class="lead text-gray-800 mb-5">csrf_token error</p>
+        <p class="text-gray-500 mb-0">please check your settings or form,csrf_token is missing ! </p>
+    </div>
+{% endblock %}
