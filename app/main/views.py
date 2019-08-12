@@ -7,12 +7,13 @@ from flask import session
 from flask import jsonify
 from flask import request
 from flask import redirect
+from flask import make_response
 from flask import render_template
 
 
 from . import main
 from app import csrf
-from app import cache
+# from app import cache
 from app.models import *
 from .forms import TeacherForm
 
@@ -60,7 +61,13 @@ def login():
         username = form_data.get("username")
         password = form_data.get("password")
 
+        # 获取用户信息
         user = User.query.filter_by(username=username).first()
+        # 检查用户身份：老师1，学生0
+        identity = user.identity
+        # 检查身份资料是否完善
+        identity_id = user.identity_id
+
         if user:
             db_password = user.password
             md5_password = SetPassword(password)
@@ -70,19 +77,62 @@ def login():
                 # 设置cookie
                 response.set_cookie("username",username)
                 response.set_cookie("user_id",str(user.id))
+
+                # 使用cookie来判断用户身份
+                response.set_cookie("identity",str(identity))
+                # 使用cookie来判断用户是否完善可个人信息
+                if identity_id:
+                    response.set_cookie("identity_id",str(identity_id))
+                else:
+                    response.set_cookie("identity_id","")
+
                 # 设置session
                 session["username"] = username
                 # 返回跳转页面
                 return response
     return render_template("login.html")
 
-@main.route("/index/")
+
+@main.route("/index/",methods=["GET","POST"])
 @loginValid
-@cache.cached(timeout=20)
+# @cache.cached(timeout=20)
 def index():
     # print(session.get('username'))
-    response = render_template("index.html",**locals())
-    return response
+    # 查讯所有课程
+    course_list = Course.query.all()
+    # 通过cookie获取教师id
+    teacher_id = request.cookies.get("identity_id")
+    if teacher_id:
+        teacher = Teacher.query.get(int(teacher_id))
+    else:
+        teacher = {}
+    # 身份信息添加
+    if request.method == "POST":
+        name = request.form.get("name")
+        age = request.form.get("age")
+        gender = request.form.get("gender")
+        course = request.form.get("course")
+        # 判断用户身份
+        if request.cookies.get("identity") == "0":
+            student = Student()
+        else:
+            teacher = Teacher()
+            teacher.name = name
+            teacher.age = age
+            teacher.gender = gender
+            teacher.course_id = int(course)
+            teacher.save()
+            # 更新用户和教师的关联
+            user = User.query.get(int(request.cookies.get("user_id")))
+            user.identity_id = teacher.id
+            user.save()
+            # 将用户的详情信息的状态改掉
+            response = make_response(render_template("index.html",**locals()))
+            response.set_cookie("identity_id",str(teacher.id))
+            return response
+
+    return render_template("index.html",**locals())
+
 
 @main.route("/logout/",methods=["GET","POST"])
 def logout():
@@ -111,8 +161,8 @@ def add_teacher():
     return render_template("add_teacher.html",**locals())
 
 # csrf 如果没有配置跳转的错误页面
-# @csrf.error_handler
-@main.errorhandler
+@csrf.error_handler
+# @main.errorhandler
 @main.route("/csrf_403/")
 def csrf_tonken_error(reason):
     return render_template("csrf_403.html")
@@ -143,7 +193,7 @@ def student_list():
     return render_template("student_lists.html",**locals())
 
 
-@main.route("/clearCache/")
-def clearCache():
-    cache.clear()
-    return "cache is clear"
+# @main.route("/clearCache/")
+# def clearCache():
+#     cache.clear()
+#     return "cache is clear"

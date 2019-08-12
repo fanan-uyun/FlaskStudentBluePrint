@@ -262,7 +262,11 @@
             <!-- Nav Item - User Information -->
             <li class="nav-item dropdown no-arrow">
               <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small">aa</span>
+                {% if request.cookies.identity == '1' %}
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ request.cookies.username }} 老师</span>
+                {% else %}
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ request.cookies.username }} 学生</span>
+                {% endif %}
                 <img class="img-profile rounded-circle" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1565191113928&di=1a747f520bdcce572a3e7de32f843032&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201805%2F13%2F20180513224039_tgfwu.png">
               </a>
               <!-- Dropdown - User Information -->
