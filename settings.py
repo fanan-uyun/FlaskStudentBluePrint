@@ -7,6 +7,7 @@ class BaseConfig():
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SECRET_KEY = "admin123"
+    CACHE_TYPE = "simple"
 
 # 调试配置
 class DebugConfig(BaseConfig):

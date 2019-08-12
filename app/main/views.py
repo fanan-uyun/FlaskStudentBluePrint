@@ -9,8 +9,10 @@ from flask import request
 from flask import redirect
 from flask import render_template
 
+
 from . import main
 from app import csrf
+from app import cache
 from app.models import *
 from .forms import TeacherForm
 
@@ -76,6 +78,7 @@ def login():
 
 @main.route("/index/")
 @loginValid
+@cache.cached(timeout=20)
 def index():
     # print(session.get('username'))
     response = render_template("index.html",**locals())
@@ -140,4 +143,7 @@ def student_list():
     return render_template("student_lists.html",**locals())
 
 
-
+@main.route("/clearCache/")
+def clearCache():
+    cache.clear()
+    return "cache is clear"
