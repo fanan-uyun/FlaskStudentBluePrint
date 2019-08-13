@@ -100,12 +100,20 @@ def index():
     # print(session.get('username'))
     # 查讯所有课程
     course_list = Course.query.all()
-    # 通过cookie获取教师id
-    teacher_id = request.cookies.get("identity_id")
-    if teacher_id:
-        teacher = Teacher.query.get(int(teacher_id))
+    # 通过cookie获取identity_id和identity
+    identity_id = request.cookies.get("identity_id")
+    identity = request.cookies.get("identity")
+    if identity_id:
+        if identity == '1':
+            teacher = Teacher.query.get(int(identity_id))
+        else:
+            student = Student.query.get(int(identity_id))
     else:
-        teacher = {}
+        if identity == '1':
+            teacher = {}
+        else:
+            student = {}
+
     # 身份信息添加
     if request.method == "POST":
         name = request.form.get("name")
@@ -115,6 +123,18 @@ def index():
         # 判断用户身份
         if request.cookies.get("identity") == "0":
             student = Student()
+            student.name = name
+            student.age = age
+            student.gender = gender
+            student.save()
+            # 更新用户和学生的关联
+            user = User.query.get(int(request.cookies.get("user_id")))
+            user.identity_id = student.id
+            user.save()
+            # 将用户的详情信息的状态改掉
+            response = make_response(render_template("index.html", **locals()))
+            response.set_cookie("identity_id", str(student.id))
+            return response
         else:
             teacher = Teacher()
             teacher.name = name

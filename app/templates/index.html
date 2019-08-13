@@ -10,6 +10,7 @@
         <div class="row">
         <div class="col-lg-12">
             <!-- Basic Card Example -->
+            {% if request.cookies.identity == "1" %}
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary" style="text-align: center">
@@ -35,6 +36,33 @@
                     </p>
                 </div>
               </div>
+            {% else %}
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary" style="text-align: center">
+                        欢迎 {{ student.name }} 同学登录系统
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p>
+                        学生姓名: {{ student.name }}
+                    </p>
+
+                    <p>
+                        学生年龄: {{ student.age }}
+                    </p>
+
+                    <p>
+                        {% if student.gender == 1 %}
+                            学生性别: 男
+                        {% else %}
+                            学生性别: 女
+                        {% endif %}
+
+                    </p>
+                </div>
+          </div>
+            {% endif %}
         </div>
     </div>
     </div>
@@ -55,7 +83,7 @@
                     </div>
 
                     <div class="form-group">
-                        <input class="form-control" type="text" name="name" placeholder="教师姓名">
+                        <input class="form-control" type="text" name="name" placeholder="姓名">
                     </div>
 
                     <div class="form-group">
@@ -70,7 +98,7 @@
                             <option value="2">女</option>
                         </select>
                     </div>
-
+                    {% if request.cookies.identity == "1" %}
                     <div class="form-group">
                         <select class="form-control custom-select" name="course">
                             {% for course in course_list %}
@@ -79,6 +107,8 @@
                         </select>
 {#                        <input class="form-control" type="text" name="course" placeholder="课程">#}
                     </div>
+                    {% else %}
+                    {% endif %}
 
                      <div class="form-group" style="float: right;">
                         <input class="btn btn-primary" type="submit" value="提交信息">
